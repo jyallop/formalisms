@@ -1,7 +1,7 @@
 import Lake
 open Lake DSL
 
-package «ACT» where
+package «project» where
   -- Settings applied to both builds and interactive editing
   leanOptions := #[
     ⟨`pp.unicode.fun, true⟩, -- pretty-prints `fun a ↦ b`
@@ -13,5 +13,5 @@ require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git"
 
 @[default_target]
-lean_lib «ACT» where
+lean_lib «Project» where
   -- add any library configuration options here
