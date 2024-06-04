@@ -7,3 +7,8 @@ def add : Integer → Integer → Integer
 | Integer.zero, y => y
 | (Integer.succ n), y => add n (Integer.succ y)
 
+structure Rational where
+  num : Int
+  den : Nat
+  inv : den ≠ 0
+
