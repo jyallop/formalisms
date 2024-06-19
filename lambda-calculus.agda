@@ -12,7 +12,7 @@ open import Data.Nat using (ℕ; _≡ᵇ_; zero; suc)
 open import Data.Nat.Properties as N
 open import Relation.Binary using (Rel; DecidableEquality)
 open import Relation.Binary.PropositionalEquality as Eq
-open import Relation.Nullary.Sum using (_⊎-dec_)
+open import Relation.Nullary using (_⊎-dec_)
 open import Relation.Nullary.Negation using (contradiction)
 open import Data.List
 

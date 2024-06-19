@@ -1,5 +1,5 @@
 open import Axiom.Extensionality.Propositional
-open import Data.Integer.Base using (ℤ; _+_; 0ℤ; -_; _⊖_)
+open import Data.Integer.Base using (ℤ; 0ℤ; -_; _⊖_)
 open import Data.Nat.Base using (zero)
 open import Data.Nat.Properties using (+-identityʳ)
 open import Data.Integer.Properties using (+-comm)
@@ -10,6 +10,7 @@ open import Level using (Level; _⊔_; suc)
 open import Data.Product using (proj₁; proj₂)
 open import Algebra.Definitions using (LeftCongruent; RightCongruent; Congruent₂; Congruent₁)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
+open import Data.Nat.Base using (ℕ; suc; zero; _+_)
 
 Op₂ : ∀ {ℓ} → Set ℓ → Set ℓ
 Op₂ A = A → A → A
@@ -53,6 +54,7 @@ module Algebra where
       isGroup     : IsGroup Obj _≈_ _·_ ϵ _⁻¹
 
     open IsGroup isGroup public
+
   
   module Properties {g₁ g₂} (G : Group g₁ g₂) where
     open Group G
@@ -312,3 +314,72 @@ module Algebra where
       ≈⟨ sym c≈c ⟩
         c
       ∎
+
+
+  module GroupPower {g₁ g₂} (G : Group g₁ g₂) where
+    open Group G
+    open import Relation.Binary.Reasoning.Setoid setoid
+
+    _^_ : ∀ a → (n : ℕ) → Obj
+    _ ^ ℕ.zero = ϵ
+    a ^ (ℕ.suc x) = a · (a ^ x)
+
+    power-prop : ∀ {a} → (n : ℕ) → a · a ^ n ≈ a ^ (ℕ.suc n)
+    power-prop {a} zero = refl
+    power-prop {a} (ℕ.suc n) = ·-congˡ (power-prop n)
+
+    power-law : ∀ {a b} → (n : ℕ) → (b · a · (b ⁻¹)) ^ n ≈ b · (a ^ n) · (b ⁻¹)
+    power-law {a} {b} zero = begin
+             ϵ
+           ≈⟨ sym (proj₂ (inverse b)) ⟩
+             b · b ⁻¹ 
+           ≈⟨ ·-congʳ (sym (proj₁ (identity b))) ⟩
+             (b · ϵ) · (b ⁻¹)
+           ∎
+    power-law {a} {b} (ℕ.suc n) = begin
+             ((b · a · b ⁻¹) ^ ℕ.suc n)
+           ≈⟨ refl ⟩
+             (b · a · b ⁻¹) · (b · a · b ⁻¹) ^ n
+           ≈⟨ ·-congˡ (power-law n) ⟩
+             ((b · a) · b ⁻¹) · ((b · a ^ n) · (b ⁻¹))
+           ≈⟨ sym (associative ((b · a) · (b ⁻¹)) (b · (a ^ n)) (b ⁻¹)) ⟩
+             ((b · a) · b ⁻¹) · (b · a ^ n) · (b ⁻¹)
+           ≈⟨ ·-congʳ (sym (associative ((b · a) · (b ⁻¹)) b (a ^ n))) ⟩
+             ((((b · a) · b ⁻¹) · b) · a ^ n) · (b ⁻¹)
+           ≈⟨ ·-congʳ (·-congʳ (associative (b · a) (b ⁻¹) b)) ⟩
+             (((b · a) · ((b ⁻¹) · b)) · a ^ n) · (b ⁻¹)
+           ≈⟨ ·-congʳ (·-congʳ (·-congˡ (proj₁ (inverse b)))) ⟩
+             (((b · a) · ϵ) · a ^ n) · (b ⁻¹)
+           ≈⟨ ·-congʳ (·-congʳ (proj₁ (identity (b · a)))) ⟩
+             ((b · a) · a ^ n) · (b ⁻¹)
+           ≈⟨ ·-congʳ (associative b a (a ^ n)) ⟩
+             b · (a · a ^ n) · (b ⁻¹)
+           ≈⟨ ·-congʳ (·-congˡ (power-prop n)) ⟩
+             b · (a ^ ℕ.suc n) · (b ⁻¹)
+           ∎
+
+    {-# TERMINATING #-}
+    power-law-two : ∀ {a b} → (n : ℕ) → (a · b) ^ n ≈ (a ^ n) · (b ^ n)
+    power-law-two {a} {b} zero = sym (proj₁ (identity ϵ))
+    power-law-two {a} {b} (ℕ.suc n) =
+      begin
+        a · b · ((a · b) ^ n)
+      ≈⟨ refl ⟩
+        (a · b) ^ (ℕ.suc n)
+      ≈⟨ power-law-two (ℕ.suc n) ⟩
+        (a ^ ℕ.suc n) · (b ^ ℕ.suc n)
+      ≈⟨ refl ⟩
+        a · (a ^ n) · (b · (b ^ n))
+      ∎
+
+    power-law-three : ∀ {a} → a ^ 2 ≈ ϵ → ∃[ x ] x ^ 2 ≈ a
+    power-law-three prop = {!!} , {!!}
+
+    power-law-four : ∀ {a} → a ^ 3 ≈ ϵ → ∃[ x ] x ^ 3 ≈ a
+      power-law-four prop = {!!} , {!!}
+
+    power-law-five : ∀ {a} → ∃[ x ] x ^ 3 ≈ a ⁻¹ → ∃[ y ] y ^ 3 ≈ a
+    power-law-five (fst , snd) = {!!} , {!!}
+
+    power-law-six : ∀ {a b} → ∃[ x ] x · a · x ≈ b → ∃[ y ] y ^ 2 ≈ a · b
+    power-law-six (fst , snd) = {!!} , {!!}

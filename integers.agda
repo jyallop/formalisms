@@ -2,6 +2,7 @@ open import Data.Nat using (ℕ; _+_; _*_; suc; zero; _^_)
 open import Data.Nat.DivMod using (_/_)
 open import Agda.Builtin.Equality using (_≡_; refl)
 open import Relation.Binary.PropositionalEquality
+open import Relation.Unary using (_∈_; Pred)
 open ≡-Reasoning
 
 record Rational : Set₁ where
@@ -18,10 +19,14 @@ series n@(suc m) = (n ^ 2) + series m
 
 lemma-one : (n : ℕ) → (series n) ≡ n * (n + 1) * (2 * n + 1) / 6
 lemma-one zero = refl
+--lemma-one (suc n) = {!!}
 lemma-one (suc n) = begin
           (suc n) ^ 2 + series n
     ≡⟨ +-rcong {series n} {n * (n + 1) * (2 * n + 1) / 6} {(suc n) ^ 2} (lemma-one n) ⟩
-      (suc n) ^ 2 + (n * (n + 1) * (2 * n + 1) / 6)
+          (suc n) ^ 2 + (n * (n + 1) * (2 * n + 1) / 6)
     ≡⟨ {!!} ⟩
-    {!!}
+          (suc n) ^ 2 + ((((n * n) + n)) * (2 * n + 1)) / 6
+    ≡⟨ {!!} ⟩
+          suc n * (suc n + 1) * (2 * suc n + 1) / 6
   ∎
+
