@@ -27,3 +27,5 @@ S {x} {y} {z} = record {
                id (((inj₂ (inj₂ y) , snd₂) , snd₁) , snd) → snd₂ y
                }
   }
+
+consistent-I-K : ¬ (Con I K)

@@ -18,6 +18,14 @@ Op₂ A = A → A → A
 Op₁ : ∀ {ℓ} → Set ℓ → Set ℓ
 Op₁ A = A → A
 
+
+
+record G {n l : Level} (A : Set n) (_·_ : A → A → A) (_≈_ : Rel A l) : Set (n ⊔ l) where
+  field
+    identity : A
+    id-law : (x : A) → (x · identity) ≈ x
+    inverse-law : (x : A) → ∃[ y ] (((x · y) ≈ identity) × ((y · x) ≈ identity))
+
 module Algebra where
   record IsGroup {c} {ℓ} (Obj : Set c) (_≈_ : Rel Obj ℓ) (_·_ : Op₂ Obj) (ϵ : Obj) (_⁻¹ : Op₁ Obj) : Set (Level.suc (c ⊔ ℓ)) where
     field
@@ -316,9 +324,6 @@ module Algebra where
       ∎
 
 
-  module GroupPower {g₁ g₂} (G : Group g₁ g₂) where
-    open Group G
-    open import Relation.Binary.Reasoning.Setoid setoid
 
     _^_ : ∀ a → (n : ℕ) → Obj
     _ ^ ℕ.zero = ϵ
@@ -361,25 +366,72 @@ module Algebra where
     {-# TERMINATING #-}
     power-law-two : ∀ {a b} → (n : ℕ) → (a · b) ^ n ≈ (a ^ n) · (b ^ n)
     power-law-two {a} {b} zero = sym (proj₁ (identity ϵ))
-    power-law-two {a} {b} (ℕ.suc n) =
+    power-law-two {a} {b} (ℕ.suc n) = 
       begin
-        a · b · ((a · b) ^ n)
-      ≈⟨ refl ⟩
-        (a · b) ^ (ℕ.suc n)
-      ≈⟨ power-law-two (ℕ.suc n) ⟩
-        (a ^ ℕ.suc n) · (b ^ ℕ.suc n)
-      ≈⟨ refl ⟩
+        a · b · (a · b) ^ n
+       ≈⟨ refl ⟩
+         (a · b) ^ (ℕ.suc n)
+       ≈⟨ power-law-two (ℕ.suc n) ⟩
         a · (a ^ n) · (b · (b ^ n))
       ∎
 
-    power-law-three : ∀ {a} → a ^ 2 ≈ ϵ → ∃[ x ] x ^ 2 ≈ a
-    power-law-three prop = {!!} , {!!}
+    power-law-three : ∀ {a} → a ^ 2 ≈ ϵ → ∃[ x ] x ^ 3 ≈ a
+    power-law-three {a} prop = a ,
+      (begin
+        a · (a · (a · ϵ))
+      ≈⟨ ·-congˡ prop ⟩
+        a · ϵ
+      ≈⟨ proj₁ (identity a) ⟩ 
+        a
+      ∎)
 
-    power-law-four : ∀ {a} → a ^ 3 ≈ ϵ → ∃[ x ] x ^ 3 ≈ a
-      power-law-four prop = {!!} , {!!}
-
+    power-law-four : ∀ {a} → a ^ 3 ≈ ϵ → ∃[ x ] x ^ 2 ≈ a
+    power-law-four {a} prop = a ^ 2 ,
+      (begin
+        a · (a · ϵ) · (a · (a · ϵ) · ϵ)
+      ≈⟨ ·-congʳ (·-congˡ (proj₁ (identity a))) ⟩
+        ((a · a) · ((a · (a · ϵ)) · ϵ))
+      ≈⟨ ·-congˡ (proj₁ (identity (a · (a · ϵ)))) ⟩
+        ((a · a) · (a · (a · ϵ)))
+      ≈⟨ associative a a (a · (a · ϵ)) ⟩
+        (a · (a · (a · (a · ϵ))))
+      ≈⟨ ·-congˡ prop ⟩ 
+        a · ϵ
+      ≈⟨ proj₁ (identity a) ⟩ 
+        a
+      ∎)
+        
     power-law-five : ∀ {a} → ∃[ x ] x ^ 3 ≈ a ⁻¹ → ∃[ y ] y ^ 3 ≈ a
-    power-law-five (fst , snd) = {!!} , {!!}
+    power-law-five {a} (x , prop) = (x ⁻¹) ,
+      (begin
+        x ⁻¹ · (x ⁻¹ · (x ⁻¹ · ϵ))
+      ≈⟨ ·-congˡ (·-congˡ (proj₁ (identity (x ⁻¹)))) ⟩
+        x ⁻¹ · (x ⁻¹ · x ⁻¹)
+      ≈⟨ ·-congˡ (sym inverse-law) ⟩
+        x ⁻¹ · (x · x) ⁻¹
+      ≈⟨ sym inverse-law ⟩
+        (x · x · x) ⁻¹
+      ≈⟨ ⁻¹-cong (associative x x x) ⟩
+        (x · (x · x)) ⁻¹
+      ≈⟨ ⁻¹-cong (·-congˡ (·-congˡ (sym (proj₁ (identity x))))) ⟩
+        (x · (x · (x · ϵ))) ⁻¹
+      ≈⟨ ⁻¹-cong prop ⟩
+        (a ⁻¹) ⁻¹
+      ≈⟨ double-inverse-law ⟩
+        a
+      ∎)
+
 
     power-law-six : ∀ {a b} → ∃[ x ] x · a · x ≈ b → ∃[ y ] y ^ 2 ≈ a · b
-    power-law-six (fst , snd) = {!!} , {!!}
+    power-law-six {a} {b} (x , prop) = (a · x) ,
+      (begin
+        (a · x) · ((a · x) · ϵ)
+      ≈⟨ ·-congˡ (proj₁ (identity (a · x))) ⟩
+        (a · x) · (a · x)
+      ≈⟨ associative a x (a · x) ⟩
+        a · (x · (a · x))
+      ≈⟨ ·-congˡ (sym (associative x a x)) ⟩
+        a · (x · a · x)
+      ≈⟨ ·-congˡ prop ⟩
+        a · b
+      ∎)

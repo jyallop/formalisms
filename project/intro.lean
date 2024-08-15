@@ -148,7 +148,7 @@ end
 -- Examples.
 
 section
-variable (a b c d : ℝ)
+variable (a b c d x y : ℝ)
 
 example (a b c d : ℝ) (hyp : c = d * a + b) (hyp' : b = a * d) : c = 2 * a * d := by
   rw [hyp'] at hyp
@@ -266,3 +266,140 @@ theorem mul_inv_rev (a b : G) : (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
     mul_right_inv, one_mul, mul_right_inv, mul_one]
 
 end MyRing
+
+variable (a b c d e x y: ℝ)
+open Real
+--#check (le_refl : ∀ a, a ≤ a)
+--#check (le_trans : a ≤ b → b ≤ c → a ≤ c)
+--#check (lt_of_le_of_lt : a ≤ b → b < c → a < c)
+--#check (lt_of_lt_of_le : a < b → b ≤ c → a < c)
+--#check (lt_trans : a < b → b < c → a < c)
+
+example (h₀ : a ≤ b) (h₁ : b < c) (h₂ : c ≤ d) (h₃ : d < e) : a < e := by
+  apply lt_trans (lt_of_le_of_lt h₀ h₁) (lt_of_le_of_lt h₂ h₃)
+
+#check (exp_le_exp : exp a ≤ exp b ↔ a ≤ b)
+#check (exp_lt_exp : exp a < exp b ↔ a < b)
+#check (log_le_log : 0 < a → a ≤ b → log a ≤ log b)
+#check (log_lt_log : 0 < a → a < b → log a < log b)
+#check (add_le_add : a ≤ b → c ≤ d → a + c ≤ b + d)
+#check (add_le_add_left : a ≤ b → ∀ c, c + a ≤ c + b)
+#check (add_le_add_right : a ≤ b → ∀ c, a + c ≤ b + c)
+#check (add_lt_add_of_le_of_lt : a ≤ b → c < d → a + c < b + d)
+#check (add_lt_add_of_lt_of_le : a < b → c ≤ d → a + c < b + d)
+#check (add_lt_add_left : a < b → ∀ c, c + a < c + b)
+#check (add_lt_add_right : a < b → ∀ c, a + c < b + c)
+#check (add_nonneg : 0 ≤ a → 0 ≤ b → 0 ≤ a + b)
+#check (add_pos : 0 < a → 0 < b → 0 < a + b)
+#check (add_pos_of_pos_of_nonneg : 0 < a → 0 ≤ b → 0 < a + b)
+#check (exp_pos : ∀ a, 0 < exp a)
+#check add_le_add_left
+
+example (h₀ : d ≤ e) : c + exp (a + d) ≤ c + exp (a + e) := by
+  apply add_le_add_left
+  . apply exp_le_exp.mpr
+    . apply add_le_add_left h₀
+
+example : (0 : ℝ) < 1 := by norm_num
+
+example (h : a ≤ b) : log (1 + exp a) ≤ log (1 + exp b) := by
+  have h₀ : 0 < 1 + exp a := by
+    linarith [exp_pos a]
+  apply log_le_log h₀
+  apply add_le_add_left (exp_le_exp.mpr h)
+
+example (h : a ≤ b) : c - exp b ≤ c - exp a := by
+  refine sub_le_sub_left ?h c
+  . exact exp_le_exp.mpr h
+
+
+#check (min_le_left a b : min a b ≤ a)
+#check (min_le_right a b : min a b ≤ b)
+#check (le_min : c ≤ a → c ≤ b → c ≤ min a b)
+
+
+example : max a b = max b a := by
+  have h : ∀ x y : ℝ, max x y ≤ max y x := by
+    intro x y
+    apply max_le
+    · apply le_max_right
+    · apply le_max_left
+  apply le_antisymm
+  apply h
+  apply h
+
+
+example : min (min a b) c = min a (min b c) := by
+  apply le_antisymm
+  · apply le_min
+    · apply le_trans
+      apply min_le_left
+      apply min_le_left
+    apply le_min
+    · apply le_trans
+      apply min_le_left
+      apply min_le_right
+    apply min_le_right
+  · apply le_min
+    · apply le_min
+      · apply min_le_left
+      apply le_trans
+      apply min_le_right
+      apply min_le_left
+    apply le_trans
+    apply min_le_right
+    apply min_le_right
+
+
+theorem aux : min a b + c ≤ min (a + c) (b + c) := by
+  apply le_min
+  · apply add_le_add_right
+    apply min_le_left
+  · apply add_le_add_right
+    apply min_le_right
+
+example : min a b + c = min (a + c) (b + c) := by
+  apply le_antisymm
+  · apply aux
+  have h : min (a + c) (b + c) = min (a + c) (b + c) - c + c := by rw [sub_add_cancel]
+  rw [h]
+  apply add_le_add_right
+  rw [sub_eq_add_neg]
+  apply le_trans
+  apply aux
+  rw [add_neg_cancel_right]
+  rw [add_neg_cancel_right]
+
+#check (abs_add : ∀ a b : ℝ, |a + b| ≤ |a| + |b|)
+
+example : |a| - |b| ≤ |a - b| := by
+  calc
+    |a| - |b| = |a - b + b| - |b| := by rw [sub_add_cancel]
+    _ ≤ |a - b| + |b| - |b| := by
+      apply sub_le_sub_right
+      apply abs_add
+    _ ≤ |a - b| := by rw [add_sub_cancel_right]
+
+variable (m n : ℕ)
+
+example (h : x ∣ w) : x ∣ y * (x * z) + x ^ 2 + w ^ 2 := by
+  apply dvd_add
+  · apply dvd_add
+    apply dvd_mul_of_dvd_right
+    apply dvd_mul_right
+    apply dvd_mul_left
+  · rw [pow_two]
+    apply dvd_mul_of_dvd_right
+    apply h
+
+#check (Nat.gcd_zero_right n : Nat.gcd n 0 = n)
+#check (Nat.gcd_zero_left n : Nat.gcd 0 n = n)
+#check (Nat.lcm_zero_right n : Nat.lcm n 0 = 0)
+#check (Nat.lcm_zero_left n : Nat.lcm 0 n = 0)
+
+example : Nat.gcd m n = Nat.gcd n m := by
+  apply _root_.dvd_antisymm
+  repeat
+    apply Nat.dvd_gcd
+    apply Nat.gcd_dvd_right
+    apply Nat.gcd_dvd_left

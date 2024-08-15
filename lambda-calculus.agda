@@ -225,3 +225,12 @@ fixed-point-theorem f = X ,
 ƛ→ [] ⇒ term = term
 ƛ→ x ∷ ids ⇒ term = ƛ x ⇒ (ƛ→ ids ⇒ term)
 
+data Con (M N : Λ) : Set where
+  consistent : (prop : M ＝ M) → ∀(A B : Λ) → ¬ (A ＝ B) → Con M N
+
+data Theory {l : Level} : Set (Level.suc l) where
+  theory : (terms : Set) → (axioms : Rel terms l) → Theory {l}
+
+data equation {l : Level} (t : Theory {l}) (M N : Λ) : Set (Level.suc l) where
+  formula : equation t M N
+
