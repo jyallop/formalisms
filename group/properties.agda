@@ -1,19 +1,21 @@
-open import group using (Group; Group'; IsGroup)
-open import Relation.Binary.Reasoning.Setoid 
+open import group using (Group; IsGroup)
 open import Data.Product using (proj₁; proj₂)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Product using (Σ; _,_ ; Σ-syntax; ∃; ∃-syntax; _×_)
 open import Data.Nat.Base using (ℕ; suc; zero; _+_)
 
-module group.properties {g₁ g₂} (G : Group g₁ g₂) where
-open Group
+module group.properties {g₁ g₂} (G : Group g₁ g₂) where -- Obj _·_ _⁻¹ _≈_) where
+open Group G
+open import Relation.Binary.Reasoning.Setoid setoid
 
-
-ε⁻¹≈ε : identity ⁻¹ ≈ identity
+ε⁻¹≈ε : ϵ ⁻¹ ≈ ϵ
 ε⁻¹≈ε = begin
-  (ϵ ⁻¹)      ≈⟨ sym (proj₁ (identity (ϵ ⁻¹))) ⟩
-  ((ϵ ⁻¹) · ϵ)  ≈⟨ (proj₁ (inverse ϵ)) ⟩
-  ϵ ∎
+    (ϵ ⁻¹)
+  ≈⟨ sym (proj₁ (identity (ϵ ⁻¹))) ⟩
+    ((ϵ ⁻¹) · ϵ)
+  ≈⟨ (proj₁ (inverse ϵ)) ⟩
+    ϵ
+  ∎
 
 unique-inverse : ∀ {a b} → (a · b ≈ a) → b ≈ ϵ
 unique-inverse {a} {b} prop =
@@ -375,3 +377,4 @@ power-law-six {a} {b} (x , prop) = (a · x) ,
   ≈⟨ ·-congˡ prop ⟩
     a · b
   ∎)
+

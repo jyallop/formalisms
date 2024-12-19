@@ -16,13 +16,6 @@ Op₂ A = A → A → A
 Op₁ : ∀ {ℓ} → Set ℓ → Set ℓ
 Op₁ A = A → A
 
-record Group' {n l : Level} (A : Set n) (_·_ : A → A → A)
-  (_⁻¹ : A → A) (_≈_ : Rel A l) : Set (n ⊔ l) where
-  field
-    identity : A
-    id-law : (x : A) → (x · identity) ≈ x
-    inverse-law : (x : A) → (((x · (x ⁻¹)) ≈ identity) × (((x ⁻¹) · x) ≈ identity))
-
 record IsGroup {c} {ℓ} (Obj : Set c) (_≈_ : Rel Obj ℓ) (_·_ : Op₂ Obj) (ϵ : Obj) (_⁻¹ : Op₁ Obj) : Set (Level.suc (c ⊔ ℓ)) where
   field
     equivalence : IsEquivalence _≈_
@@ -44,7 +37,7 @@ record IsGroup {c} {ℓ} (Obj : Set c) (_≈_ : Rel Obj ℓ) (_·_ : Op₂ Obj) 
 
   ·-congʳ : RightCongruent _≈_ _·_
   ·-congʳ y≈z = ·-cong y≈z refl
-    
+
 record Group c ℓ : Set (Level.suc (c ⊔ ℓ)) where
   infix  8 _⁻¹
   infixl 7 _·_
