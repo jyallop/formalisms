@@ -26,20 +26,3 @@ one_cat = record {
         _∘_ = λ { {one} {one} {one} x x₁ → refl }
   }
 
-open Category 
-
-LeftCancellable : {n l : Level} → {Obj : Set n} → {_⇒_ : Rel Obj l} → (C : Category Obj _⇒_) → Set (suc (n ⊔ l))
-LeftCancellable {n} {l} {Obj} {_⇒_} record { _≈_ = _≈_ ; id = id ; _∘_ = _∘_ } =
-  {A B C : Obj} → {g h : A ⇒ B} → (f : B ⇒ C) → (f ∘ g) ≈ (f ∘ h) → (g ≈ h)
-
-RightCancellable : {n l : Level} → {Obj : Set n} → {_⇒_ : Rel Obj l} → Category Obj _⇒_ → Set (suc (n ⊔ l))
-RightCancellable {n} {l} {Obj} {_⇒_} record { _≈_ = _≈_ ; id = id ; _∘_ = _∘_ } =
-  {A B C : Obj} → {g h : A ⇒ B} → (f : B ⇒ C) → (f ∘ g) ≈ (f ∘ h) → (g ≈ h)
-
-record Monic {n l : Level} {Obj : Set n} {_⇒_ : Rel Obj l} (C : Category Obj _⇒_) : Set (suc (n ⊔ l)) where
-  field
-    isRightCancellable : LeftCancellable C
-
-record Epic {n l : Level} {Obj : Set n} {_⇒_ : Rel Obj l} (C : Category Obj _⇒_) : Set (suc (n ⊔ l)) where 
-  field
-    isLeftCancellable : RightCancellable C

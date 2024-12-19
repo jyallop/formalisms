@@ -14,7 +14,10 @@
       in
         {
           devShell = pkgs.mkShell {
-            buildInputs = with pkgs; [ (agda.withPackages(p: [ p.standard-library ])) ];
+            buildInputs = with pkgs;
+              [
+                (agda.withPackages(p: [ p.standard-library ]))
+              ];
           };
 
           defaultPackage.${system} = pkgs.agda;

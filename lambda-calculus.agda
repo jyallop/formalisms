@@ -40,8 +40,6 @@ infix  9  `_
 _≡ⁱ_ : DecidableEquality Id
 _≡ⁱ_ = ≡-dec Data.String._≟_ N._≟_
 
-
-
 infix 9 _[_:=_]
 
 FV⟨_⟩ : Λ → Pred Id _
@@ -226,7 +224,7 @@ fixed-point-theorem f = X ,
 ƛ→ x ∷ ids ⇒ term = ƛ x ⇒ (ƛ→ ids ⇒ term)
 
 data Con (M N : Λ) : Set where
-  consistent : (prop : M ＝ M) → ∀(A B : Λ) → ¬ (A ＝ B) → Con M N
+  consistent : (prop : M ＝ N) → ∀(A B : Λ) → ¬ (A ＝ B) → Con M N
 
 data Theory {l : Level} : Set (Level.suc l) where
   theory : (terms : Set) → (axioms : Rel terms l) → Theory {l}

@@ -3,12 +3,13 @@ open import Relation.Binary.Reasoning.Setoid
 open import Data.Product using (proj₁; proj₂)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Product using (Σ; _,_ ; Σ-syntax; ∃; ∃-syntax; _×_)
+open import Data.Nat.Base using (ℕ; suc; zero; _+_)
 
 module group.properties {g₁ g₂} (G : Group g₁ g₂) where
 open Group
 
 
-ε⁻¹≈ε : ϵ ⁻¹ ≈ ϵ
+ε⁻¹≈ε : identity ⁻¹ ≈ identity
 ε⁻¹≈ε = begin
   (ϵ ⁻¹)      ≈⟨ sym (proj₁ (identity (ϵ ⁻¹))) ⟩
   ((ϵ ⁻¹) · ϵ)  ≈⟨ (proj₁ (inverse ϵ)) ⟩
