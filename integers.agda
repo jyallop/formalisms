@@ -13,10 +13,6 @@ record Rational : Set₁ where
     num : ℕ
     den : ℕ
 
-series : ℕ → ℕ
-series zero = zero
-series n@(suc m) = (n ^ 2) + series m
-
 +-congʳ : {x y z : ℕ} → x ≡ y → z + x ≡ z + y
 +-congʳ refl = refl
 
@@ -25,6 +21,10 @@ series n@(suc m) = (n ^ 2) + series m
 
 *-congˡ : {x y z : ℕ} → x ≡ y → x * z ≡ y * z
 *-congˡ refl = refl
+
+series : ℕ → ℕ
+series zero = zero
+series n@(suc m) = (n ^ 2) + series m
 
 lemma-one : (n : ℕ) → (series n) ≡ n * (n + 1) * (2 * n + 1) / 6
 lemma-one zero = refl

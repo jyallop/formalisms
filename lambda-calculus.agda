@@ -139,14 +139,16 @@ Sub⟨ ` x ⟩ = ｛ ` x ｝
 Sub⟨ x · x₁ ⟩ = Sub⟨ x ⟩ ∪ Sub⟨ x₁ ⟩ ∪ ｛ x · x₁ ｝
 Sub⟨ ƛ x ⇒ x₁ ⟩ = Sub⟨ x₁ ⟩ ∪ ｛ ƛ x ⇒ x₁ ｝
 
+record Λ⁰ : Set where
+  field
+    term : Λ
+    closed : Empty FV⟨ term ⟩
+
 data Subterm : Set where
   _⊂_ : (M N : Λ) → M ∈ Sub⟨ N ⟩ → Subterm
 
-data ActiveSubterm : Set where
---  _⊂_ : (M N : Λ) → M ∈ Sub⟨ N ⟩ → ∃[ Z ] ((N · Z) ⊂ M) → ActiveSubterm
-
-syntactic-equivalence : {x y : Λ} → x ≡ y → x ＝ y
-syntactic-equivalence refl = identity
+definitional-equivalence : {x y : Λ} → x ≡ y → x ＝ y
+definitional-equivalence refl = identity
 
 ⊎→× : ∀ {A B C : Set} → (A ⊎ B → C) → ((A → C) × (B → C))
 ⊎→× = λ{ f → f ∘ inj₁ , f ∘ inj₂ }
@@ -178,6 +180,9 @@ free-variable-substitution (ƛ x₁ ⇒ f) g x x∉f with x₁ ≡ⁱ x
 ... | yes p₁ = contradiction (p₁ , ¬p)  x∉f
 ... | no p with free-variable-substitution f g x p
 ... | prop = rule-e x₁ prop
+
+--free-variable-application-left : (f g : Λ) → (x : Id) → x ∉ FV⟨ f · g ⟩ → x ∉ FV⟨ f ⟩
+--free-variable-application-left f g x prop = λ x₁ → {!!}
 
 fixed-point-theorem : ∀ (f : Λ) → ∃[ x ] x ＝ (f · x) 
 fixed-point-theorem f = X ,
@@ -222,9 +227,6 @@ fixed-point-theorem f = X ,
 ƛ→_⇒_ : List Id → Λ → Λ
 ƛ→ [] ⇒ term = term
 ƛ→ x ∷ ids ⇒ term = ƛ x ⇒ (ƛ→ ids ⇒ term)
-
-data Con (M N : Λ) : Set where
-  consistent : (prop : M ＝ N) → ∀(A B : Λ) → ¬ (A ＝ B) → Con M N
 
 data Theory {l : Level} : Set (Level.suc l) where
   theory : (terms : Set) → (axioms : Rel terms l) → Theory {l}
