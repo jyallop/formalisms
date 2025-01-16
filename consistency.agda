@@ -8,9 +8,8 @@ record _♯_ (m n : Λ) : Set₁ where
   field
     inconsistent : m ＝ n → ((A B : Λ) → A ＝ B)
 
--- We define our own versions of the combinators here because I don't feel like dealing with
--- the additional closed term stuff I defined in the combinators module
--- They will be used to test our definition of inconsistency
+-- We define our own versions of the combinators here 
+-- They will be used to test our definition of inconsistency and prove the following:
 -- I ♯ K, I ♯ S, and (x y : Λ) → xx ♯ xxy are all proved below
 -- These are all exercises from The Lambda Calculus, its Syntax and Semantics by Henk Barendregt
 I : Λ
@@ -104,7 +103,7 @@ I♯K = record {
   }
 
 
---This proof relies on more free variable shenanigans, the _s are looking for proof of the following:
+--This proof relies on more free variable shenanigans, the _ blanks are looking for proof of the following:
 -- 1. ("y", 0) ∉ FV⟨ B ⟩
 -- 2. ("y", 0) ∉ FV⟨ A ⟩
 -- 3. ("z", 0) ∉ FV⟨ A ⟩
