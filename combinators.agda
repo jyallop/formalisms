@@ -37,4 +37,4 @@ K : {x y : Id} → Λ
 K {x} {y} = ƛ x ⇒ (ƛ y ⇒ ` x)
 
 consistent-I-K : ¬ (Con I K)
-consistent-I-K = λ x → {! x!}
+consistent-I-K (consistent prop A B x) = {!!}
