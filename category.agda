@@ -5,7 +5,8 @@ open import Agda.Builtin.Equality using (_≡_; refl)
 open import Data.Nat.Base using (ℕ; zero; _+_)
 open import Data.Nat.Properties using (+-comm)
 
--- A definition of a category following "Constructive Category Theory" by Huet
+-- I am in the process of reworking the definition of a Category 
+-- based on the following "Constructive Category Theory" by Huet
 -- The definition in that paper starts with binary relations so we give the following defintions
 -- Defines a binary relation
 R : {a b : Level} → Set a → Set b → Set (suc a ⊔ suc b)
