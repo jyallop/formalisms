@@ -8,6 +8,10 @@ open import Relation.Unary using (_∈_; Pred)
 open import Data.Product using (proj₁; proj₂)
 open ≡-Reasoning
 
+
+-- This file is probably poorly named but came from some analysis work
+-- I wanted to see what proofs about series and their convergence
+-- could look like in agda
 record Rational : Set₁ where
   field
     num : ℕ
@@ -26,6 +30,8 @@ series : ℕ → ℕ
 series zero = zero
 series n@(suc m) = (n ^ 2) + series m
 
+-- I got far enough to get the gist
+-- It got very tedious towards the end
 lemma-one : (n : ℕ) → (series n) ≡ n * (n + 1) * (2 * n + 1) / 6
 lemma-one zero = refl
 lemma-one (suc n) = begin
