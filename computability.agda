@@ -3,6 +3,7 @@ open import Data.String using (String; _==_; _≟_)
 open import Data.Product using (Σ; _,_ ; Σ-syntax; ∃; ∃-syntax; _×_)
 open import Relation.Binary.PropositionalEquality using (_≡_)
 
+-- This definition comes from the book Higher Order Computability by John Longley
 record Model {n : Level} (T : Set n) : Set (suc n) where
   field
     datatypes : T → Set n

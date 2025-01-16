@@ -2,6 +2,7 @@ open import Relation.Binary using (Setoid; IsEquivalence; Rel; _Preserves₂_⟶
 open import Level using (Level; _⊔_; suc)
 open import category
 
+--This file needs the changes to the defintion of category to be finished before it can be loaded again
 record Equivalence {n : Level} (A : Set n) (_≈_ : Rel A (suc n)) : Set (suc (suc n)) where
   field
     reflexive : ∀ a → a ≈ a
