@@ -1,6 +1,6 @@
 {-# OPTIONS --without-K --exact-split --safe --auto-inline #-}
 
-module Universes where
+module universes where
 
 open import Agda.Primitive public
   renaming (Level to Universe

@@ -1,6 +1,6 @@
 {-# OPTIONS --without-K --exact-split --safe --auto-inline #-}
 
-open import Universes public
+open import universes public
 
 -- \MCU for 𝓤
 
@@ -108,14 +108,6 @@ module ℕ-order where
   definition-backward zero y prop = prop
   definition-backward (succ x) (succ y) prop = prop
 
---TODO Exercises:
--- Exercise. After learning Σ and _＝_ explained below, prove that
-
---    x ≤ y if and only if Σ z ꞉ ℕ , x + z ＝ y.
-
--- Later, after learning univalence prove that in this case this implies
-
---    (x ≤ y) ＝ Σ z ꞉ ℕ , x + z ＝ y.
 
 data _+_ {𝓤 𝓥} (X : 𝓤 ̇) (Y : 𝓥 ̇) : (𝓤 ⊔ 𝓥) ̇ where
   inl : X → X + Y
@@ -152,7 +144,7 @@ record Σ {𝓤 𝓥} {X : 𝓤 ̇} (Y : X → 𝓥 ̇) : (𝓤 ⊔ 𝓥)̇ wher
 -Σ : {𝓤 𝓥 : Universe} (X : 𝓤 ̇) (Y : X → 𝓥 ̇) → 𝓤 ⊔ 𝓥 ̇
 -Σ X Y = Σ Y
 
-syntax -Σ X (λ x → y) = Σ x ∶ X , y
+syntax -Σ X (λ x → y) = Σ[ x ] X , y
 
 pr₁ : {X : 𝓤 ̇} {Y : X → 𝓥 ̇} → Σ Y → X
 pr₁ (x , y) = x
@@ -203,14 +195,13 @@ type-of {𝓤} {X} x = X
 data Id {𝓤} (X : 𝓤 ̇) : X → X → 𝓤 ̇ where
   refl : (x : X) → Id X x x
 
-_＝_ : {X : 𝓤 ̇} → X → X → 𝓤 ̇
+_＝_ : {X : 𝓤 ̇ } → X → X → 𝓤 ̇
 x ＝ y = Id _ x y
 
 𝕁 : (X : 𝓤 ̇) (A : (x y : X) → x ＝ y → 𝓥 ̇)
   → ((x : X) → A x x (refl x))
   → (x y : X) (p : x ＝ y) → A x y p
 𝕁 X A f x x (refl x) = f x
-
 
 ℍ : (X : 𝓤 ̇) (x : X) (B : (y : X) → x ＝ y → 𝓥 ̇)
   → B x (refl x)
@@ -220,7 +211,7 @@ x ＝ y = Id _ x y
 ℍ' : (X : 𝓤 ̇) (x : X) (B : (y : X) → x ＝ y → 𝓥 ̇)
    → B x (refl x)
    → (y : X) → (p : x ＝ y) → B y p
-ℍ' X x B b = 𝕁 {!!} {!!} {!!} x 
+ℍ' X x B b = {!!}
 
 𝕁' : (X : 𝓤 ̇) (A : (x y : X) → x ＝ y → 𝓥 ̇)
    → ((x : X) → A x x (refl x))
@@ -236,3 +227,24 @@ x ＝ y = Id _ x y
                 (f : (x : X) → A x x (refl x)) (x y : X) (p : x ＝ y)
              → 𝕁 X A f x y p ＝ 𝕁' X A f x y p
 𝕁s-agreement X A f x x (refl x) = refl (f x)
+
+module exercises_one where
+  open ℕ-order
+
+  0+x=x : {x : ℕ} → (0 Arithmetic.+ x) ＝ x
+  0+x=x = {!!}
+
+  sucx≤y→x≤sucy : (x y : ℕ) → (succ x) ≤ y → x ≤ (succ y)
+  sucx≤y→x≤sucy = {!!}
+
+  exOne : (x y : ℕ) → x ≤ y → Σ[ z ] ℕ , ((x Arithmetic.+ z) ＝ y)
+  exOne = ℕ-induction (λ x → (y : ℕ) → x ≤ y → -Σ ℕ (λ z → (x Arithmetic.+ z) ＝ y)) (λ y prop → y , 0+x=x)
+      (λ{ n f →
+        ℕ-induction (λ z → succ n ≤ z → -Σ ℕ (λ z₁ → (succ n Arithmetic.+ z₁) ＝ z))
+        (λ imp → !𝟘 (-Σ ℕ (λ z₁ → (succ n Arithmetic.+ z₁) ＝ 0)) imp)
+        (λ n' f' prop → {!!} )})
+
+  exTwo : {x y : ℕ} → (x ≤ y) ＝ (Σ[ z ] ℕ , ((x Arithmetic.+ z) ＝ y))
+  exTwo = {!!}
+
+
