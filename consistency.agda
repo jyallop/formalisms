@@ -1,11 +1,11 @@
-open import Relation.Unary using (Decidable;｛_｝; _∉_; Pred; _∪_; _∈_; ∅; Empty)
-open import Data.Product using (Σ; _,_ ; Σ-syntax; ∃; ∃-syntax; _×_; proj₁; proj₂)
-open import Relation.Nullary using (¬_)
 open import identifiers
-open import Data.Nat using (ℕ; _≡ᵇ_; zero; suc)
 open import alpha-congruence
-open import Agda.Builtin.Bool
-
+open import Relation.Unary using (Decidable;｛_｝; _∉_; Pred; _∪_; _∈_; ∅; Empty; _⊂_; _⊆_)
+open import Data.Product using (Σ; _,_ ; Σ-syntax; ∃; ∃-syntax; _×_; proj₁; proj₂)
+open import Relation.Binary.PropositionalEquality as Eq
+  hiding(subst)
+open import Data.Sum
+open import Data.Nat using (ℕ; _≡ᵇ_; zero; suc)
 
 -- In this file we take the opinion that one should not do something that would
 -- take a few lines with pen and paper when one could take hundreds of lines to do
@@ -47,7 +47,7 @@ K : Λ
 K = ƛ m ⇒ (ƛ n ⇒ (` m))
 
 S : Λ
-S = ƛ m ⇒ (ƛ n ⇒ (ƛ o ⇒ (` m · ` o · (` n · ` o)))) 
+S = ƛ m ⇒ (ƛ o ⇒ (ƛ n ⇒ (` m · ` n · (` o · ` n)))) 
 
 open ＝-Reasoning
 
@@ -59,7 +59,7 @@ I-simplifies {A} =
     A
   ∎
 
---The ultimate goal is to prove I = K is inconsistent as an axiom
+  --The ultimate goal is to prove I = K is inconsistent as an axiom
 -- we start by proving I = K ­> I = A to A is any lambda term
 k=i->i=A : {A : Λ} → I ＝ K → I ＝ A
 k=i->i=A {A} prop =
@@ -140,88 +140,100 @@ s=i->A=B {A} {B} prop =
     S · K · A · B
   ＝⟨ lemma-two ⟩ 
     K · B · (A · B)
-  ＝⟨ application (application K＝K') ⟩ 
-    K' · B · (A · B)
+  ＝⟨ application (extensional B＝B') ⟩
+    K · B' · (A · B)
   ＝⟨ reflexive ⟩
-    (ƛ m ⇒ (ƛ id ⇒ ` m)) · B · (A · B)
-  ＝⟨ application (β-conversion m (ƛ id ⇒ ` m) B) ⟩
-    ((ƛ id ⇒ ` m) [ m := B ]) · (A · B)
-  ＝⟨ application {!reflexive!} ⟩ --application (β-conversion m (ƛ id ⇒ ` m) B) ⟩ 
-    (ƛ id ⇒ B) · (A · B) 
-  ＝⟨ β-conversion id B (A · B) ⟩ 
-    B [ id := (A · B) ]
-  ＝⟨ free-variable-substitution B (A · B) id (x∉v→x∉fv id B id∉VB) ⟩
+    (ƛ m ⇒ (ƛ n ⇒ ` m)) · B' · (A · B)
+  ＝⟨ application (β-conversion m (ƛ n ⇒ ` m) B') ⟩
+    (ƛ n ⇒ B') · (A · B) 
+  ＝⟨ β-conversion n B' (A · B) ⟩ 
+    B' [ n := (A · B) ]
+  ＝⟨ free-variable-substitution B' (A · B) n (x∉v→x∉fv n B' n∉VB') ⟩
+    B'
+  ＝⟨ symmetric B＝B' ⟩
     B
   ∎
   where
-  fresh-id : Σ[ x ∈ ℕ ] x ∉ V⟨ A · B · K · S ⟩
-  fresh-id = new-identifier 0 (V⟨ A · B · K · S ⟩) λ x → (A · B · K · S) V> x
-  id : ℕ
-  id = proj₁ fresh-id
-  new-var : id ∉ V⟨ A · B · K · S ⟩
-  new-var = proj₂ fresh-id
-  id∉VA : id ∉ V⟨ A ⟩
-  id∉VA = x∉v⟨m·n⟩→x∉v⟨m⟩ id A B (x∉v⟨m·n⟩→x∉v⟨m⟩ id (A · B) K (x∉v⟨m·n⟩→x∉v⟨m⟩ id (A · B · K) S new-var))
-  id∉VB : id ∉ V⟨ B ⟩
-  id∉VB = x∉v⟨m·n⟩→x∉v⟨n⟩ id A B (x∉v⟨m·n⟩→x∉v⟨m⟩ id (A · B) K (x∉v⟨m·n⟩→x∉v⟨m⟩ id (A · B · K) S new-var))
-  id∉VK : id ∉ V⟨ K ⟩
-  id∉VK = x∉v⟨m·n⟩→x∉v⟨n⟩ id (A · B) K (x∉v⟨m·n⟩→x∉v⟨m⟩ id (A · B · K) S new-var)
-  id∉VS : id ∉ V⟨ S ⟩
-  id∉VS = x∉v⟨m·n⟩→x∉v⟨n⟩ id (A · B · K) S new-var
-  K' : Λ
-  K' = subst ℕ _≡ᵢ_ (new-identifier 0) 0 (proj₁ fresh-id) n K
-  K＝K' : K ＝ K'
-  K＝K' = subst-lemma ℕ _≡ᵢ_ (new-identifier 0) 0 id n K id∉VK 
+  fresh-id-A : Σ[ x ∈ ℕ ] x ∉ V⟨ A · (` n) ⟩
+  fresh-id-A = new-identifier 0 (V⟨ A · (` n) ⟩) λ x → (A · (` n)) V> x
+  id-A : ℕ
+  id-A = proj₁ fresh-id-A
+  new-var-A : id-A ∉ V⟨ A · (` n) ⟩
+  new-var-A = proj₂ fresh-id-A
+  ida∉A : id-A ∉ V⟨ A ⟩
+  ida∉A = x∉v⟨m·n⟩→x∉v⟨m⟩ id-A A (` n) new-var-A
+  ida≢n : n ≢ id-A
+  ida≢n = non-equality ℕ _≡ᵢ_ (new-identifier 0) 0 V⟨ A · ` n ⟩ n id-A (inj₂ (inj₂ refl))
+    λ{ (inj₁ (inj₁ x)) → ida∉A (inj₁ x)
+     ; (inj₂ (inj₁ x)) → ida∉A (inj₂ x)
+     ; (inj₂ (inj₂ y)) → x∉v⟨m·n⟩→x∉v⟨n⟩ id-A A (` n) new-var-A (inj₂ y) }
+  A' : Λ
+  A' = subst ℕ _≡ᵢ_ (new-identifier 0) 0 (proj₁ fresh-id-A) n A
+  A＝A' : A ＝ A'
+  A＝A' = subst-lemma ℕ _≡ᵢ_ (new-identifier 0) 0 id-A n A ida∉A
+  n∉VA' : n ∉ V⟨ A' ⟩
+  n∉VA' = subst-idem ℕ _≡ᵢ_ (new-identifier 0) 0 id-A n (λ{ x → ida≢n (sym x) }) A
+  fresh-id-B : Σ[ x ∈ ℕ ] x ∉ V⟨ B · (` n) ⟩
+  fresh-id-B = new-identifier 0 (V⟨ B · (` n) ⟩) λ x → (B · (` n)) V> x
+  id-B : ℕ
+  id-B = proj₁ fresh-id-B
+  new-var-B : id-B ∉ V⟨ B · (` n) ⟩
+  new-var-B = proj₂ fresh-id-B
+  idb∉B : id-B ∉ V⟨ B ⟩
+  idb∉B = x∉v⟨m·n⟩→x∉v⟨m⟩ id-B B (` n) new-var-B
+  idb≢n : n ≢ id-B
+  idb≢n = non-equality ℕ _≡ᵢ_ (new-identifier 0) 0 V⟨ B · ` n ⟩ n id-B (inj₂ (inj₂ refl))
+    λ{ (inj₁ (inj₁ x)) → idb∉B (inj₁ x)
+     ; (inj₂ (inj₁ x)) → idb∉B (inj₂ x)
+     ; (inj₂ (inj₂ y)) → x∉v⟨m·n⟩→x∉v⟨n⟩ id-B B (` n) new-var-B (inj₂ y) }
+  B' : Λ
+  B' = subst ℕ _≡ᵢ_ (new-identifier 0) 0 (proj₁ fresh-id-B) n B
+  B＝B' : B ＝ B'
+  B＝B' = subst-lemma ℕ _≡ᵢ_ (new-identifier 0) 0 id-B n B idb∉B
+  n∉VB' : n ∉ V⟨ B' ⟩
+  n∉VB' = subst-idem ℕ _≡ᵢ_ (new-identifier 0) 0 id-B n (λ{ x → idb≢n (sym x) }) B
   lemma-one : (I · K · A · B) ＝ A
   lemma-one =
     begin
       I · K · A · B
     ＝⟨ application (application I-simplifies) ⟩
       K · A · B
-    ＝⟨ application (application K＝K') ⟩ 
-      K' · A · B
+    ＝⟨ application (extensional A＝A') ⟩ 
+      K · A' · B
     ＝⟨ reflexive ⟩
-      (ƛ m ⇒ (ƛ id ⇒ ` m)) · A · B
-    ＝⟨ application (β-conversion m (ƛ id ⇒ ` m) A) ⟩
-      (ƛ id ⇒ ` m) [ m := A ] · B
-    ＝⟨ {!!} ⟩ --β-conversion id A B ⟩
-      A [ id := B ]
-    ＝⟨ free-variable-substitution A B id (x∉v→x∉fv id A id∉VA) ⟩
+      (ƛ m ⇒ (ƛ n ⇒ ` m)) · A' · B
+    ＝⟨ application (β-conversion m (ƛ n ⇒ ` m) A') ⟩
+      (ƛ n ⇒ A') · B
+    ＝⟨ β-conversion n A' B ⟩
+      A' [ n := B ]
+    ＝⟨ free-variable-substitution A' B n (x∉v→x∉fv n A' n∉VA') ⟩
+      A'
+    ＝⟨ symmetric A＝A' ⟩ 
       A
     ∎
-  S' : Λ
-  S' = subst ℕ _≡ᵢ_ (new-identifier 0) 0 (proj₁ fresh-id) o S
-  S＝S' : S ＝ S'
-  S＝S' = subst-lemma ℕ _≡ᵢ_ (new-identifier 0) 0 id o S id∉VS 
   lemma-two : (S · K · A · B) ＝ (K · B · (A · B))
   lemma-two =
     begin
       S · K · A · B
-    ＝⟨ application (application (application S＝S')) ⟩ 
-      S' · K · A · B
+    ＝⟨ application (extensional A＝A') ⟩
+      S · K · A' · B
     ＝⟨ reflexive ⟩ 
-      (ƛ m ⇒ (ƛ n ⇒ (ƛ id ⇒ (` m · ` id · (` n · ` id))))) · K · A · B
-    ＝⟨ {!!} ⟩
-      ((ƛ n ⇒ (ƛ id ⇒ (` m · ` id · (` n · ` id)))) [ m := K ]) · A · B
-    ＝⟨ application {!!} ⟩  --application (application (β-conversion m
-        --                           (ƛ n ⇒
-       --                             (ƛ o ⇒
-        --                             ` m · ` o · (` n · ` o)))
-        --                           K)) ⟩
+      (ƛ m ⇒ (ƛ o ⇒ (ƛ n ⇒ (` m · ` n · (` o · ` n))))) · K · A' · B
+    ＝⟨ application (application (β-conversion m
+                                   (ƛ o ⇒
+                                    (ƛ n ⇒
+                                     ` m · ` n · (` o · ` n)))
+                                     K)) ⟩
+      (ƛ o ⇒ (ƛ n ⇒ K · ` n · (` o · ` n))) · A' · B
+    ＝⟨ application (β-conversion o (ƛ n ⇒ K · ` n · (` o · ` n)) A') ⟩
       (ƛ n ⇒
-        (ƛ id ⇒
-         K · ` id · (` n · ` id)))
-       · A
+         K · ` n · (A' · ` n))
        · B
-    ＝⟨ {!!} ⟩ -- application (β-conversion n (ƛ id ⇒ K · ` id · (` n · ` id)) A) ⟩
-      (ƛ id ⇒
-         K · ` id · (A · ` id))
-       · B
-    ＝⟨ β-conversion id (K · ` id · (A · ` id)) B ⟩
-      (K · ` id · (A · ` id)) [ id := B ]
-    ＝⟨ {!!} ⟩ 
-      K · B · ((A [ id := B ]) · B)
-    ＝⟨ {!!} ⟩ --extensional (application (free-variable-substitution A B id {!!})) ⟩
+    ＝⟨ β-conversion n (K · ` n · (A' · ` n)) B ⟩
+      K · B · ((A' [ n := B ]) · B)
+    ＝⟨ extensional (application (free-variable-substitution A' B n (x∉v→x∉fv n A' n∉VA'))) ⟩
+      K · B · (A' · B)
+    ＝⟨ extensional (application (symmetric A＝A')) ⟩ 
       K · B · (A · B)
     ∎
 
@@ -234,4 +246,4 @@ xx♯xy = record { inconsistent = λ prop A B → helper prop }
   where
     helper : ∀ {x} {y} (prop : (` x · ` x) ＝ (` x · ` y)) {A} {B} →
          A ＝ B
-    helper x =  {!o!}
+    helper x =  {!!}
