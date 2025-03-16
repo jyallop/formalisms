@@ -1,41 +1,51 @@
-open import Data.Nat.Base using (ℕ; zero; _+_)
+open import Data.Nat using (ℕ; zero; _+_)
+open import Data.Nat.Properties using (+-comm; +-assoc)
+open import Relation.Binary.PropositionalEquality.Core using (cong)
 open import category
-open import category.examples
+open import Agda.Builtin.Equality using (_≡_; refl)
+open import Level
 
 module category.monoid where
 
-data n-type : ℕ → ℕ → Set where
-  arrow-label : {n : ℕ} → n-type n n
+data One {o : Level} : Set o where
+  one : One
 
-arrow-equivalence : Equivalence n-type
-arrow-equivalence = record { eq_refl = λ x → arrow-label ; eq_transitive = λ{ arrow-label arrow-label → arrow-label }; eq_symmetric = λ{ arrow-label → arrow-label }}
-
-n-setoid : One → One → Setoid
-n-setoid one one =
-  record {
-      carrier = ℕ
-    ; _＝_ = λ{ x y → n-type x y }
-    ; equivalence-relation = arrow-equivalence
+record Monoid {o : Level} : Set (suc (suc (suc o))) where
+  field
+    M : Set o
+    op : M → M → M
+    _＝_ : M → M → Set o
+    ＝-equiv : Equivalence _＝_
+    e : M
+    op-assoc : (x y z : M) → op (op x y) z ＝ op x (op y z)
+    id-right : (x : M) → op x e ＝ x
+    id-left : (x : M) → op e x ＝ x
+  isCategory : Category
+  isCategory = record {
+      Obj = One
+    ; hom = λ _ _ → record { carrier = M ; _＝_ = λ x y → x ＝ y ; equivalence-relation = ＝-equiv }
+    ; isCategory = record
+                    { _∘_ = λ g f → op g f
+                    ; id = λ A → e
+                    ; associative = λ {A} {B} {C} {D} {f} {g} {h} → op-assoc h g f
+                    ; id-law-left = λ {A} {B} {f} → id-left f
+                    ; id-law-right = λ {A} {B} {f} → id-right f
+                    }
     }
 
-arrow-label-cong : {n m : ℕ} → n-setoid one one ~ n ＝ m → n-setoid one one ~ ℕ.suc n ＝ ℕ.suc m
-arrow-label-cong arrow-label = arrow-label
-
-integers : Category
-integers = record
-            { Obj = One
-            ; hom = n-setoid
-            ; _∘_ = λ{ {one} {one} {one} g f → f + g }
-            ; id = λ{ one → ℕ.zero }
-            ; associative = λ{ {one} {one} {one} {one} {f} {g} {h} → helper-one f g h }
-            ; id-law-left = λ{ {one} {one} {f} → helper-two f }
-            ; id-law-right = λ{ {one} {one} {f} → arrow-label }
-            }
-          where
-            helper-one : (f g h : ∣ n-setoid one one ∣) → n-setoid one one ~ f + (g + h) ＝ (f + g + h)
-            helper-one ℕ.zero g h = arrow-label
-            helper-one (ℕ.suc f) g h = arrow-label-cong (helper-one f g h)
-            helper-two : (f : ∣ n-setoid one one ∣) → n-setoid one one ~ f + ℕ.zero ＝ f
-            helper-two ℕ.zero = arrow-label
-            helper-two (ℕ.suc f) = arrow-label-cong (helper-two f)
+integers : Monoid
+integers = record {
+               M = ℕ
+             ; op = _+_
+             ; _＝_ = λ x y → x ≡ y
+             ; ＝-equiv = record {
+                 eq_refl = λ x → refl
+               ; eq_transitive = λ{ refl refl → refl }
+               ; eq_symmetric = λ{ refl → refl }
+               }
+             ; e = 0
+             ; op-assoc = λ x y z → +-assoc x y z
+             ; id-right = λ x → +-comm x 0
+             ; id-left = λ x → refl
+             }
 

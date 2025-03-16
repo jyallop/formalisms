@@ -24,10 +24,12 @@ one-hom one one =
 one-cat : Category
 one-cat = record
            { Obj = One
-           ; hom = one-hom 
-           ; _∘_ = λ{ {one} {one} {one} refl refl → refl }
-           ; id = λ{ one → refl }
-           ; associative = λ{ {one} {one} {one} {one} {refl} {refl} {refl} → refl }
-           ; id-law-left = λ{ {one} {one} {refl} → refl }
-           ; id-law-right = λ{ {one} {one} {refl} → refl }
+           ; hom = one-hom
+           ; isCategory = record {
+                        _∘_ = λ{ {one} {one} {one} refl refl → refl }
+                      ; id = λ{ one → refl }
+                      ; associative = λ{ {one} {one} {one} {one} {refl} {refl} {refl} → refl }
+                      ; id-law-left = λ{ {one} {one} {refl} → refl }
+                      ; id-law-right = λ{ {one} {one} {refl} → refl }
+                      }
            }

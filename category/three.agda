@@ -64,47 +64,49 @@ three-category : Category
 three-category = record {
     Obj = Three
   ; hom = three-hom-setoid
-  ; _∘_ = λ{
-      {one} {one} {one} g f → one-to-one
-    ; {one} {one} {C} g f → g
-    ; {one} {two} {two} g f → one-to-two
-    ; {one} {two} {three} g f → one-to-three
-    ; {one} {three} {three} g f → one-to-three
-    ; {two} {two} {C} g f → g 
-    ; {two} {three} {three} g f → two-to-three
-    ; {three} {three} {three} g f → three-to-three
-    }
-  ; id = λ{ one → one-to-one ; two → two-to-two ; three → three-to-three }
-  ; associative = λ{
-      {one} {one} {one} {one} {f} {g} {h} → refl
-    ; {one} {one} {one} {two} {f} {g} {h} → refl
-    ; {one} {one} {one} {three} {f} {g} {h} → refl
-    ; {one} {one} {two} {two} {f} {g} {h} → refl
-    ; {one} {one} {two} {three} {f} {g} {h} → refl
-    ; {one} {one} {three} {three} {f} {g} {h} → refl
-    ; {one} {two} {two} {two} {f} {g} {h} → refl
-    ; {one} {two} {two} {three} {f} {g} {h} → refl
-    ; {one} {two} {three} {three} {f} {g} {h} → refl
-    ; {one} {three} {three} {three} {f} {g} {h} → refl
-    ; {two} {two} {C} {D} {f} {g} {h} → refl
-    ; {two} {three} {three} {three} {f} {g} {h} → refl
-    ; {three} {three} {three} {three} {f} {g} {h} → refl
-    }
-  ; id-law-left = λ{
-      {one} {one} {one-to-one} → refl
-    ; {one} {two} {one-to-two} → refl
-    ; {one} {three} {one-to-three} → refl
-    ; {two} {two} {two-to-two} → refl
-    ; {two} {three} {two-to-three} → refl
-    ; {three} {three} {three-to-three} → refl
-    }
-  ; id-law-right = λ{
-      {one} {one} {one-to-one} → refl
-    ; {one} {two} {one-to-two} → refl
-    ; {one} {three} {one-to-three} → refl
-    ; {two} {two} {two-to-two} → refl
-    ; {two} {three} {f} → refl
-    ; {three} {three} {three-to-three} → refl
+  ; isCategory = record {
+    _∘_ = λ{
+          {one} {one} {one} g f → one-to-one
+        ; {one} {one} {C} g f → g
+        ; {one} {two} {two} g f → one-to-two
+        ; {one} {two} {three} g f → one-to-three
+        ; {one} {three} {three} g f → one-to-three
+        ; {two} {two} {C} g f → g 
+        ; {two} {three} {three} g f → two-to-three
+        ; {three} {three} {three} g f → three-to-three
+        }
+    ; id = λ{ one → one-to-one ; two → two-to-two ; three → three-to-three }
+    ; associative = λ{
+        {one} {one} {one} {one} {f} {g} {h} → refl
+      ; {one} {one} {one} {two} {f} {g} {h} → refl
+      ; {one} {one} {one} {three} {f} {g} {h} → refl
+      ; {one} {one} {two} {two} {f} {g} {h} → refl
+      ; {one} {one} {two} {three} {f} {g} {h} → refl
+      ; {one} {one} {three} {three} {f} {g} {h} → refl
+      ; {one} {two} {two} {two} {f} {g} {h} → refl
+      ; {one} {two} {two} {three} {f} {g} {h} → refl
+      ; {one} {two} {three} {three} {f} {g} {h} → refl
+      ; {one} {three} {three} {three} {f} {g} {h} → refl
+      ; {two} {two} {C} {D} {f} {g} {h} → refl
+      ; {two} {three} {three} {three} {f} {g} {h} → refl
+      ; {three} {three} {three} {three} {f} {g} {h} → refl
+      }
+    ; id-law-left = λ{
+        {one} {one} {one-to-one} → refl
+      ; {one} {two} {one-to-two} → refl
+      ; {one} {three} {one-to-three} → refl
+      ; {two} {two} {two-to-two} → refl
+      ; {two} {three} {two-to-three} → refl
+      ; {three} {three} {three-to-three} → refl
+      }
+    ; id-law-right = λ{
+        {one} {one} {one-to-one} → refl
+      ; {one} {two} {one-to-two} → refl
+      ; {one} {three} {one-to-three} → refl
+      ; {two} {two} {two-to-two} → refl
+      ; {two} {three} {f} → refl
+      ; {three} {three} {three-to-three} → refl
+      }
     }
   }
     

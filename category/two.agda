@@ -29,13 +29,15 @@ two-cat : Category
 two-cat = record
            { Obj = Two
            ; hom = two-relation-setoid
-           ; _∘_ = λ{ g one-one → g ; two-two one-two → one-two ; two-two two-two → two-two }
-           ; id = λ{ one → one-one ; two → two-two }
-           ; associative = λ{ {A} {B} {C} {D} {one-one} {one-one} {one-one} → refl
-             ; {A} {B} {C} {D} {one-one} {one-one} {one-two} → refl
-             ; {A} {B} {C} {D} {one-one} {one-two} {two-two} → refl
-             ; {A} {B} {C} {D} {one-two} {two-two} {two-two} → refl
-             ; {A} {B} {C} {D} {two-two} {two-two} {two-two} → refl }
-           ; id-law-left = λ { {one} {one} {one-one} → refl ; {one} {two} {one-two} → refl ; {two} {two} {two-two} → refl }
-           ; id-law-right = λ { {one} {one} {one-one} → refl ; {one} {two} {one-two} → refl ; {two} {B} {two-two} → refl }
+           ; isCategory = record {
+               _∘_ = λ{ g one-one → g ; two-two one-two → one-two ; two-two two-two → two-two }
+             ; id = λ{ one → one-one ; two → two-two }
+             ; associative = λ{ {A} {B} {C} {D} {one-one} {one-one} {one-one} → refl
+               ; {A} {B} {C} {D} {one-one} {one-one} {one-two} → refl
+               ; {A} {B} {C} {D} {one-one} {one-two} {two-two} → refl
+               ; {A} {B} {C} {D} {one-two} {two-two} {two-two} → refl
+               ; {A} {B} {C} {D} {two-two} {two-two} {two-two} → refl }
+             ; id-law-left = λ { {one} {one} {one-one} → refl ; {one} {two} {one-two} → refl ; {two} {two} {two-two} → refl }
+             ; id-law-right = λ { {one} {one} {one-one} → refl ; {one} {two} {one-two} → refl ; {two} {B} {two-two} → refl }
+             }
            }

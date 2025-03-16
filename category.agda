@@ -73,16 +73,19 @@ map-setoid A B =
 _⇒_ : {a b : Level} → (A : Setoid {a}) → (B : Setoid {b}) → Setoid {suc a ⊔ suc b}
 A ⇒ B = map-setoid A B
 
-record Category {o : Level} : Set (suc (suc o)) where
-  eta-equality
-  open Setoid
+record IsCategory {o : Level} (Obj : Set o) (hom : Obj → Obj → Setoid {o}) : Set (suc o) where
   infix 9 _∘_
   field
-    Obj : Set o
-    hom : Obj → Obj → Setoid {o}
     _∘_ : {A B C : Obj} → (g : ∣ hom B C ∣) → (f : ∣ hom A B ∣) → ∣ (hom A C) ∣
     id : (A : Obj) → ∣ (hom A A) ∣
     associative : {A B C D : Obj} {f : ∣ hom A B ∣} {g : ∣ hom B C ∣} {h : ∣ hom C D ∣} → hom A D ~ ((h ∘ g) ∘ f) ＝ (h ∘ (g ∘ f))
     id-law-left : {A B : Obj} {f : ∣ hom A B ∣} → hom A B ~ ((id B) ∘ f) ＝ f
     id-law-right : {A B : Obj} {f : ∣ hom A B ∣ } → hom A B ~ (f ∘ (id A)) ＝ f
 
+record Category {o : Level} : Set (suc (suc o)) where
+  eta-equality
+  open Setoid
+  field
+    Obj : Set o
+    hom : Obj → Obj → Setoid {o}
+    isCategory : IsCategory Obj hom
