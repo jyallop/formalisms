@@ -1,4 +1,6 @@
 open import Data.String using (String; _==_; _≟_)
+open import Relation.Binary.PropositionalEquality as Eq
+  hiding(subst)
 open import Data.Bool using (Bool; true; false; _∧_)
 open import Data.Product using (Σ; _,_ ; Σ-syntax; ∃; ∃-syntax; _×_; proj₁; proj₂)
 open import Data.Product.Properties using (≡-dec; ×-≡,≡↔≡)
@@ -93,6 +95,20 @@ module lambda-calculus (id : Set)
   ... | vs | no ¬a | no ¬b = no λ{ (inj₁ x) → ¬b x ; (inj₂ y) → ¬a y }
   ... | vs | no ¬a | yes a = yes (inj₁ a)
   ... | vs | yes a | bv = yes (inj₂ a)
+
+  x∉v→x∉fv : (x : id) → (m : Λ) → x ∉ V⟨ m ⟩ → x ∉ FV⟨ m ⟩
+  x∉v→x∉fv x (` y) prop = λ{ refl → prop (inj₂ refl) }
+  x∉v→x∉fv x (m · n) prop = λ{ (inj₁ x) → prop (inj₂ (inj₁ x)) ; (inj₂ y) → prop (inj₂ (inj₂ y)) }
+  x∉v→x∉fv x (ƛ y ⇒ m) prop = λ{ x' → prop (inj₂ x') }
+
+  x∉v⟨m·n⟩→x∉v⟨m⟩ : (x : id) → (m n : Λ) → x ∉ V⟨ m · n ⟩ → x ∉ V⟨ m ⟩
+  x∉v⟨m·n⟩→x∉v⟨m⟩ x m n prop = λ{ (inj₁ x) → prop (inj₁ (inj₁ x)) ; (inj₂ y) → prop (inj₂ (inj₁ y)) }
+
+  x∉v⟨m·n⟩→x∉v⟨n⟩ : (x : id) → (m n : Λ) → x ∉ V⟨ m · n ⟩ → x ∉ V⟨ n ⟩
+  x∉v⟨m·n⟩→x∉v⟨n⟩ x m n prop = λ{ (inj₁ x) → prop (inj₁ (inj₂ x)) ; (inj₂ y) → prop (inj₂ (inj₂ y)) }
+
+  x∉v⟨y→m⟩→x∉v⟨m⟩ : (x y : id) → (m : Λ) → x ∉ V⟨ ƛ y ⇒ m ⟩ → x ∉ V⟨ m ⟩
+  x∉v⟨y→m⟩→x∉v⟨m⟩ x y m prop = λ{ (inj₁ x) → prop (inj₁ (inj₂ x)) ; (inj₂ y) → prop (inj₂ (y , λ{ refl → prop (inj₁ (inj₁ refl)) })) }
 
   {-# TERMINATING #-}
   _[_:=_]α : Λ → id → Λ → Λ 
